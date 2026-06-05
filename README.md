@@ -124,34 +124,19 @@ Berisi styling untuk tampilan tabel, modal form, dan tombol-tombol.
 ### Tampilan Halaman Utama
 Data artikel dimuat otomatis dari API saat halaman dibuka.
 
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/28b88686-1389-4494-9b31-deaea3946e50" />
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/6051af7b-9659-4406-ba0f-2a4a51e82992" />
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/6967412b-f11a-41fa-84b9-5d6c5999ef1a" />
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/4e350d5e-a05b-42c5-af3d-5aff8bd7c08e" />
 
 ### Fitur Tambah Data
 Klik tombol **Tambah Data** → isi form → klik **Simpan**.
 
-📸 *[Screenshot: Modal form tambah data]*
-
-📸 *[Screenshot: Data baru muncul di tabel setelah disimpan]*
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/6051af7b-9659-4406-ba0f-2a4a51e82992" />
 
 ### Fitur Edit Data
 Klik **Edit** pada salah satu baris → ubah data → klik **Simpan**.
 
-📸 *[Screenshot: Modal form edit dengan data terisi]*
-
-📸 *[Screenshot: Data berhasil diubah di tabel]*
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/6967412b-f11a-41fa-84b9-5d6c5999ef1a" />
 
 ### Fitur Hapus Data
 Klik **Hapus** → konfirmasi → data terhapus dari tabel.
 
-📸 *[Screenshot: Dialog konfirmasi hapus]*
-
-📸 *[Screenshot: Data berhasil dihapus dari tabel]*
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/28b88686-1389-4494-9b31-deaea3946e50" />
