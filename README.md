@@ -140,3 +140,333 @@ Klik **Edit** pada salah satu baris → ubah data → klik **Simpan**.
 Klik **Hapus** → konfirmasi → data terhapus dari tabel.
 
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/28b88686-1389-4494-9b31-deaea3946e50" />
+
+
+# Praktikum 12 - SPA Frontend VueJS & Vue Router
+
+## Langkah-Langkah Praktikum
+
+### Langkah 1 — Persiapan Struktur Folder
+
+Buka kembali folder `lab8_vuejs` dari praktikum sebelumnya, lalu buat folder baru `components` di dalam `assets/js/`. Struktur folder akhir menjadi:
+
+```
+lab8_vuejs/
+├── index.html
+└── assets/
+    ├── css/
+    │   └── style.css
+    ├── img/
+    │   └── foto.jpg
+    └── js/
+        ├── app.js
+        └── components/
+            ├── Home.js
+            ├── Artikel.js
+            └── About.js
+```
+
+### Langkah 2 — Modifikasi `index.html`
+
+File `index.html` diubah total menjadi layout SPA. `<div id="app">` dikosongkan karena seluruh tampilan dirender oleh Vue melalui JavaScript. Library Vue Router ditambahkan via CDN. Tiga file komponen dimuat sebelum `app.js` agar sudah tersedia saat router diinisialisasi.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPA Frontend VueJS & Vue Router</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <script src="assets/js/components/Home.js"></script>
+    <script src="assets/js/components/Artikel.js"></script>
+    <script src="assets/js/components/About.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
+```
+
+
+### Langkah 3 — Membuat Komponen `Home.js`
+
+File `assets/js/components/Home.js` berisi komponen halaman beranda. Komponen ini ditampilkan saat pengguna mengakses route `/`.
+
+```javascript
+const Home = {
+    template: `
+    <div class="home-container">
+        <h2>Selamat Datang di Portal Admin Artikel</h2>
+        <p>Gunakan menu navigasi di atas untuk mengelola data artikel secara real-time
+        memanfaatkan RESTful API CodeIgniter 4 dan VueJS.</p>
+    </div>
+    `
+};
+```
+
+
+### Langkah 4 — Membuat Komponen `Artikel.js`
+
+File `assets/js/components/Artikel.js` berisi seluruh logika CRUD artikel yang dipindahkan dari `app.js` lama. Komponen ini terhubung ke REST API CodeIgniter 4.
+
+```javascript
+const Artikel = {
+    template: `
+    <div>
+        <h2>Manajemen Data Artikel</h2>
+        <button id="btn-tambah" @click="tambah">Tambah Data</button>
+
+        <div class="modal" v-if="showForm">
+            <div class="modal-content">
+                <span class="close" @click="showForm = false">&times;</span>
+                <form id="form-data" @submit.prevent="saveData">
+                    <h3>{{ formTitle }}</h3>
+                    <div>
+                        <input type="text" v-model="formData.judul"
+                               placeholder="Judul Artikel" required>
+                    </div>
+                    <div>
+                        <textarea v-model="formData.isi" rows="6"
+                                  placeholder="Isi Artikel" required></textarea>
+                    </div>
+                    <div>
+                        <select v-model="formData.status">
+                            <option v-for="option in statusOptions" :value="option.value">
+                                {{ option.text }}
+                            </option>
+                        </select>
+                    </div>
+                    <input type="hidden" v-model="formData.id">
+                    <button type="submit" id="btnSimpan">Simpan</button>
+                    <button type="button" @click="showForm = false">Batal</button>
+                </form>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Judul</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(row, index) in artikel" :key="row.id">
+                    <td class="center-text">{{ row.id }}</td>
+                    <td>{{ row.judul }}</td>
+                    <td>{{ statusText(row.status) }}</td>
+                    <td class="center-text">
+                        <a href="#" @click.prevent="edit(row)">Edit</a>
+                        <a href="#" @click.prevent="hapus(index, row.id)">Hapus</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    `,
+    data() {
+        return {
+            artikel: [],
+            formData: { id: null, judul: '', isi: '', status: 0 },
+            showForm: false,
+            formTitle: 'Tambah Data',
+            statusOptions: [
+                { text: 'Draft',   value: 0 },
+                { text: 'Publish', value: 1 }
+            ]
+        }
+    },
+    mounted() {
+        this.loadData();
+    },
+    methods: {
+        loadData() {
+            axios.get(apiUrl + '/post')
+                .then(response => { this.artikel = response.data.artikel; })
+                .catch(error => console.log(error));
+        },
+        tambah() {
+            this.showForm  = true;
+            this.formTitle = 'Tambah Data';
+            this.formData  = { id: null, judul: '', isi: '', status: 0 };
+        },
+        edit(data) {
+            this.showForm  = true;
+            this.formTitle = 'Ubah Data';
+            this.formData  = { id: data.id, judul: data.judul, isi: data.isi, status: data.status };
+        },
+        hapus(index, id) {
+            if (confirm('Yakin menghapus data?')) {
+                axios.delete(apiUrl + '/post/' + id)
+                    .then(response => { this.artikel.splice(index, 1); })
+                    .catch(error => console.log(error));
+            }
+        },
+        saveData() {
+            const params = new URLSearchParams();
+            params.append('judul', this.formData.judul);
+            params.append('isi', this.formData.isi);
+            params.append('status', this.formData.status);
+
+            if (this.formData.id) {
+                axios.post(apiUrl + '/post/' + this.formData.id + '/edit', params)
+                    .then(response => { this.loadData(); })
+                    .catch(error => console.log(error));
+            } else {
+                axios.post(apiUrl + '/post', params)
+                    .then(response => { this.loadData(); })
+                    .catch(error => console.log(error));
+            }
+            this.formData = { id: null, judul: '', isi: '', status: 0 };
+            this.showForm = false;
+        },
+        statusText(status) {
+            if (!status) return 'Draft';
+            return status == 1 ? 'Publish' : 'Draft';
+        }
+    }
+};
+```
+
+
+### Langkah 5 — Membuat Komponen `About.js` (Tugas)
+
+File `assets/js/components/About.js` menampilkan halaman profil mahasiswa. Ini merupakan tugas tambahan dari modul — menambahkan route `/about` beserta komponen baru.
+
+```javascript
+const About = {
+    template: `
+    <div class="home-container">
+        <h2>About</h2>
+        <img src="assets/img/foto.jpg" alt="Foto"
+             style="width:120px; border-radius:50%; margin-bottom:10px;"><br>
+        <table border="1" cellpadding="8" style="border-collapse:collapse;">
+            <tr><td><b>Nama</b></td><td>[Nama Lengkap]</td></tr>
+            <tr><td><b>NIM</b></td><td>[NIM]</td></tr>
+            <tr><td><b>Kelas</b></td><td>[Kelas]</td></tr>
+            <tr><td><b>Mata Kuliah</b></td><td>Pemrograman Web 2</td></tr>
+        </table>
+    </div>
+    `
+};
+```
+
+
+### Langkah 6 — Konfigurasi Vue Router di `app.js`
+
+File `assets/js/app.js` diperbarui menjadi inti konfigurasi SPA. Di sini didefinisikan routes, instance Vue Router, dan komponen root `App` yang berisi template navigasi dan `<router-view>`.
+
+- `createWebHashHistory()` — menggunakan `#` di URL sehingga tidak perlu konfigurasi server
+- `<router-link>` — komponen navigasi Vue Router pengganti tag `<a>`
+- `<router-view>` — tempat komponen halaman aktif dirender secara dinamis
+- `app.use(router)` — mendaftarkan router ke instance Vue
+
+```javascript
+const { createApp } = Vue;
+const { createRouter, createWebHashHistory } = VueRouter;
+
+const apiUrl = 'http://localhost/lab11_ci/ci4/public';
+
+const routes = [
+    { path: '/',        component: Home },
+    { path: '/artikel', component: Artikel },
+    { path: '/about',   component: About },
+];
+
+const router = createRouter({
+    history: createWebHashHistory(),
+    routes
+});
+
+const App = {
+    template: `
+    <div>
+        <header>
+            <h1>Aplikasi Panel Single Page (SPA)</h1>
+            <nav class="nav-menu">
+                <router-link to="/">Beranda</router-link> |
+                <router-link to="/artikel">Kelola Artikel</router-link> |
+                <router-link to="/about">About</router-link>
+            </nav>
+        </header>
+        <main style="margin-top: 20px;">
+            <router-view></router-view>
+        </main>
+    </div>
+    `
+};
+
+const app = createApp(App);
+app.use(router);
+app.mount('#app');
+```
+
+
+### Langkah 7 — Menambahkan CSS Navigasi di `style.css`
+
+Menambahkan style untuk navbar dan class `.router-link-exact-active` yang otomatis ditambahkan Vue Router pada link aktif.
+
+```css
+.nav-menu {
+    padding: 10px;
+    background: #eff1ff;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #3152d6;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+/* Style otomatis saat route aktif */
+.router-link-exact-active {
+    background-color: #3152d6;
+    color: #ffffff !important;
+    border-radius: 3px;
+}
+
+.home-container {
+    padding: 20px;
+    border: 1px solid #eff1ff;
+    background: #fafafa;
+}
+```
+
+
+## Hasil Running Aplikasi
+
+### Halaman Beranda (`localhost/lab8_vuejs/#/`)
+
+Halaman pertama yang muncul saat aplikasi dibuka. Menu **Beranda** aktif ditandai warna biru.
+
+📸 *[Screenshot: Tampilan halaman Beranda di browser]*
+
+---
+
+### Halaman Kelola Artikel (`localhost/lab8_vuejs/#/artikel`)
+
+Halaman manajemen artikel yang menampilkan data dari REST API CodeIgniter 4.
+
+📸 *[Screenshot: Tampilan halaman Kelola Artikel di browser]*
+
+---
+
+### Halaman About (`localhost/lab8_vuejs/#/about`)
+
+Halaman profil mahasiswa dengan foto dan data identitas.
+
+📸 *[Screenshot: Tampilan halaman About di browser]*
+
+---
+
