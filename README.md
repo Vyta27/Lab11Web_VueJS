@@ -450,24 +450,16 @@ Menambahkan style untuk navbar dan class `.router-link-exact-active` yang otomat
 
 Halaman pertama yang muncul saat aplikasi dibuka. Menu **Beranda** aktif ditandai warna biru.
 
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/7548016e-3c7a-45e9-9e39-93bf5a3de8e8" />
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/c401553e-e27f-40a7-b7f1-a6b0e13c4fb8" />
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/40eda747-d0f9-4e9f-b2c7-f98d5b736be3" />
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/06d537c2-06b7-4eaf-86c8-55120c13e382" />
 
 ### Halaman Kelola Artikel (`localhost/lab8_vuejs/#/artikel`)
 
 Halaman manajemen artikel yang menampilkan data dari REST API CodeIgniter 4.
 
-📸 *[Screenshot: Tampilan halaman Kelola Artikel di browser]*
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/c401553e-e27f-40a7-b7f1-a6b0e13c4fb8" />
 
 ### Halaman About (`localhost/lab8_vuejs/#/about`)
 
 Halaman profil mahasiswa dengan foto dan data identitas.
 
-📸 *[Screenshot: Tampilan halaman About di browser]*
-
----
-
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/7548016e-3c7a-45e9-9e39-93bf5a3de8e8" />
