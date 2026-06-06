@@ -456,7 +456,7 @@ Halaman pertama yang muncul saat aplikasi dibuka. Menu **Beranda** aktif ditanda
 
 Halaman manajemen artikel yang menampilkan data dari REST API CodeIgniter 4.
 
-<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/c401553e-e27f-40a7-b7f1-a6b0e13c4fb8" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/daf90304-0c7c-46cf-acfa-2c87d2b18e9f" />
 
 ### Halaman About (`localhost/lab8_vuejs/#/about`)
 
