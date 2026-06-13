@@ -463,3 +463,134 @@ Halaman manajemen artikel yang menampilkan data dari REST API CodeIgniter 4.
 Halaman profil mahasiswa dengan foto dan data identitas.
 
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/7548016e-3c7a-45e9-9e39-93bf5a3de8e8" />
+
+# Praktikum 13 - VueJS Autentikasi dan Navigation Guards (SPA Security)
+
+## Langkah-Langkah Praktikum
+
+## TAHAP 1 — Backend CodeIgniter 4
+
+### Langkah 1.1 — Membuat Auth Controller
+
+Buat folder `Api` di dalam `app/Controllers/`, lalu buat file baru `app/Controllers/Api/Auth.php`.
+
+Controller ini berfungsi menerima request login dari frontend, memverifikasi kredensial user ke database, dan mengembalikan token jika berhasil.
+
+**Penjelasan kode:**
+- `$this->request->getVar('username')` — mengambil input username dari request
+- `password_verify()` — memverifikasi password yang di-hash menggunakan PHP
+- `base64_encode("TOKEN-SECRET-" . $user['username'])` — membuat token sederhana untuk simulasi autentikasi
+- `failUnauthorized()` — mengembalikan response HTTP 401 jika login gagal
+
+### Langkah 1.2 — Mendaftarkan Route API Login
+
+Buka `app/Config/Routes.php` dan tambahkan satu baris route:
+
+```php
+$routes->post('api/login', 'Api\Auth::login');
+```
+
+Route ini mendaftarkan endpoint `POST /api/login` yang akan diakses oleh frontend Vue menggunakan Axios.
+
+## TAHAP 2 — Frontend VueJS
+
+### Langkah 2.1 — Membuat Komponen Login
+
+Buat file baru `assets/js/components/Login.js`.
+
+Komponen ini menampilkan form login dengan dua input (username dan password), lalu mengirimkan data ke API backend menggunakan Axios.
+
+**Penjelasan direktif Vue yang digunakan:**
+- `v-model="username"` — two-way binding input ke data `username`
+- `@submit.prevent="handleLogin"` — mencegah reload halaman saat form disubmit
+- `v-if="errorMessage"` — menampilkan pesan error hanya jika ada
+
+**Alur login:**
+1. User isi form dan klik tombol Masuk
+2. Axios POST ke `apiUrl + '/api/login'`
+3. Jika berhasil → simpan `isLoggedIn` dan `userToken` ke localStorage → redirect ke `/artikel`
+4. Jika gagal → tampilkan pesan error di bawah form
+
+### Langkah 2.2 — Mengonfigurasi Navigation Guards di app.js
+
+Buka `assets/js/app.js` dan lakukan 3 perubahan utama:
+
+**1. Tambah rute Login dan properti meta:**
+- Rute `/login` didaftarkan dengan komponen `Login`
+- Rute `/artikel` dan `/about` diberi properti `meta: { requiresAuth: true }` — menandakan rute ini hanya boleh diakses setelah login
+
+**2. Tambah fungsi `router.beforeEach()`:**
+Fungsi ini dipanggil setiap kali user berpindah halaman. Logikanya:
+- Cek apakah rute tujuan memerlukan autentikasi (`requiresAuth: true`)
+- Jika ya, cek localStorage apakah `isLoggedIn === 'true'`
+- Jika belum login → tampilkan alert dan redirect ke `/login`
+- Jika sudah login → izinkan akses (`next()`)
+
+**3. Tambah method `logout()`:**
+Menghapus data localStorage dan redirect ke halaman beranda.
+
+### Langkah 2.3 — Menyesuaikan index.html
+
+Buka `index.html` dan lakukan perubahan:
+
+**Yang diubah:**
+- Judul halaman menjadi `Secured SPA Frontend VueJS`
+- Tambah script `Login.js` sebelum `app.js`
+- Tambah menu navigasi Login/Logout yang dinamis:
+  - `v-if="!isLoggedIn"` — tampilkan link Login jika belum login
+  - `v-else` — tampilkan link Logout jika sudah login
+  - `@click.prevent="logout"` — panggil method logout saat diklik
+
+
+### Langkah 2.4 — Menambahkan CSS Form Login
+
+Tambahkan CSS berikut di paling bawah `assets/css/style.css` untuk styling form login:
+
+- `.login-container` — memusatkan form di tengah halaman menggunakan flexbox
+- `.login-box` — kotak form dengan border, shadow, dan background putih
+- `.btn-login` — tombol submit berwarna biru
+- `.error-msg` — teks error berwarna merah di bawah form
+
+
+## Hasil Pengujian
+
+### Skenario A — Akses Ditolak (Belum Login)
+
+1. Buka `http://localhost/lab8_vuejs/`
+2. Klik menu **Kelola Artikel**
+3. Sistem menampilkan alert "Akses Ditolak! Anda harus login terlebih dahulu."
+4. Halaman otomatis diarahkan ke form Login
+
+> **Screenshot:**
+> ![Akses Ditolak](screenshots/p13_akses_ditolak.png)
+
+---
+
+### Skenario B — Login Berhasil
+
+1. Buka halaman Login di `http://localhost/lab8_vuejs/#/login`
+2. Masukkan username: `admin` dan password: `admin123`
+3. Sistem memvalidasi ke database backend melalui Axios
+4. Jika berhasil → masuk ke halaman Kelola Artikel
+5. Menu navigasi berubah dari **Login** menjadi **Logout**
+
+> **Screenshot:**
+> ![Form Login](screenshots/p13_form_login.png)
+
+> **Screenshot:**
+> ![Login Berhasil](screenshots/p13_login_berhasil.png)
+
+---
+
+### Skenario C — Logout
+
+1. Klik link **Logout** di menu navigasi
+2. Muncul konfirmasi "Apakah Anda yakin ingin keluar?"
+3. Klik OK → localStorage dihapus → kembali ke halaman Beranda
+4. Menu navigasi kembali menampilkan link **Login**
+
+> **Screenshot:**
+> ![Logout](screenshots/p13_logout.png)
+
+---
+
