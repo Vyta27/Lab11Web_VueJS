@@ -561,10 +561,13 @@ Tambahkan CSS berikut di paling bawah `assets/css/style.css` untuk styling form 
 3. Sistem menampilkan alert "Akses Ditolak! Anda harus login terlebih dahulu."
 4. Halaman otomatis diarahkan ke form Login
 
-> **Screenshot:**
-> ![Akses Ditolak](screenshots/p13_akses_ditolak.png)
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/f20fecc4-fbc5-44cd-9984-2a5014ea035a" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/26f84f4b-26e4-4c2d-a608-c6956a44525d" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/353d3fba-14d0-48d0-b46f-7f3101e8079c" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/1cf7b0a3-6ea4-4b82-8c17-6c0d472dc3ba" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/1ebc6704-6e52-4931-96d9-78b67f6c6e51" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/f3ea03de-dc29-4976-86e8-0d7540a30f93" />
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/09200cf7-e577-41e3-8108-fa67eb3db67a" />
 
 ### Skenario B — Login Berhasil
 
