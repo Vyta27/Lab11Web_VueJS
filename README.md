@@ -586,3 +586,223 @@ Tambahkan CSS berikut di paling bawah `assets/css/style.css` untuk styling form 
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/26f84f4b-26e4-4c2d-a608-c6956a44525d" />
 
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/f20fecc4-fbc5-44cd-9984-2a5014ea035a" />
+
+
+# Praktikum 14 - Keamanan API, Token Authentication, dan Axios Interceptors
+
+## Langkah-Langkah Praktikum
+
+## TAHAP 1 — Backend CodeIgniter 4
+
+### Langkah 1.1 — Membuat ApiAuthFilter
+
+Buat file baru `app/Filters/ApiAuthFilter.php`.
+
+Filter ini bertugas memeriksa setiap request yang masuk ke endpoint yang diproteksi. Jika tidak ada token di header `Authorization`, server langsung menolak request dengan response HTTP 401.
+
+**Penjelasan kode:**
+- `$request->getServer('HTTP_AUTHORIZATION')` — mengambil nilai header Authorization dari request HTTP
+- `preg_match('/Bearer\s(\S+)/', $authHeader, $matches)` — mengekstrak nilai token dari format `Bearer <token>`
+- `Services::response()->setStatusCode(401)` — mengembalikan HTTP 401 Unauthorized jika token tidak ada atau tidak valid
+- Method `after()` dibiarkan kosong karena tidak ada aksi yang perlu dilakukan setelah response dikirim
+
+```php
+<?php
+namespace App\Filters;
+
+use CodeIgniter\Filters\FilterInterface;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Config\Services;
+
+class ApiAuthFilter implements FilterInterface
+{
+    public function before(RequestInterface $request, $arguments = null)
+    {
+        $authHeader = $request->getServer('HTTP_AUTHORIZATION');
+
+        if (!$authHeader) {
+            $response = Services::response();
+            $response->setStatusCode(401);
+            return $response->setJSON([
+                'status'   => 401,
+                'error'    => 401,
+                'messages' => 'Akses Ditolak. Token tidak ditemukan pada request!'
+            ]);
+        }
+
+        $token = null;
+        if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            $token = $matches[1];
+        }
+
+        if (!$token || empty($token)) {
+            $response = Services::response();
+            $response->setStatusCode(401);
+            return $response->setJSON([
+                'status'   => 401,
+                'error'    => 401,
+                'messages' => 'Sesi Token tidak valid atau kedaluwarsa!'
+            ]);
+        }
+    }
+
+    public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
+    {
+        // Tidak diperlukan aksi setelah request
+    }
+}
+```
+
+### Langkah 1.2 — Mendaftarkan Filter di Filters.php
+
+Buka `app/Config/Filters.php` dan tambahkan alias `apiauth` di bagian `$aliases`:
+
+```php
+'apiauth' => \App\Filters\ApiAuthFilter::class,
+```
+
+**Penjelasan:**
+Mendaftarkan alias `apiauth` memungkinkan filter dipanggil menggunakan nama pendek di konfigurasi route, tanpa perlu menulis namespace lengkap setiap saat.
+
+### Langkah 1.3 — Menerapkan Filter ke Route
+
+Buka `app/Config/Routes.php` dan tambahkan route yang diproteksi dengan filter `apiauth`:
+
+```php
+// Route yang diproteksi — hanya bisa diakses dengan token
+$routes->post('post', 'Post::create', ['filter' => 'apiauth']);
+$routes->put('post/(:segment)', 'Post::update/$1', ['filter' => 'apiauth']);
+$routes->delete('post/(:segment)', 'Post::delete/$1', ['filter' => 'apiauth']);
+
+// Route resource tetap ada untuk GET (tidak diproteksi)
+$routes->resource('post');
+```
+
+**Penjelasan:**
+- Hanya operasi yang mengubah data (POST, PUT, DELETE) yang diproteksi dengan token
+- Operasi GET dibiarkan terbuka agar data artikel tetap bisa dibaca publik
+- `['filter' => 'apiauth']` — menerapkan ApiAuthFilter pada route tersebut
+
+
+## TAHAP 2 — Frontend VueJS
+
+### Langkah 2.1 — Menambahkan Axios Interceptors di app.js
+
+Buka `assets/js/app.js` dan tambahkan dua blok interceptor sebelum definisi routes.
+
+**Request Interceptor — Penyuntik Token Otomatis:**
+
+```javascript
+axios.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('userToken');
+        if (token) {
+            config.headers['Authorization'] = 'Bearer ' + token;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+```
+
+**Penjelasan:**
+- Setiap kali Axios mengirim request (GET, POST, DELETE, dll), interceptor ini otomatis berjalan terlebih dahulu
+- `localStorage.getItem('userToken')` — mengambil token yang disimpan saat login berhasil
+- `config.headers['Authorization'] = 'Bearer ' + token` — menyuntikkan token ke header request
+- Tanpa interceptor, kita harus menambahkan header ini secara manual di setiap pemanggilan Axios
+
+**Response Interceptor — Penangkap Error 401 Global:**
+
+```javascript
+axios.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            alert('Sesi Anda telah berakhir atau Token tidak sah. Silakan login kembali.');
+            localStorage.clear();
+            window.location.href = '#/login';
+            window.location.reload();
+        }
+        return Promise.reject(error);
+    }
+);
+```
+
+**Penjelasan:**
+- Jika server mengembalikan status 401, interceptor ini otomatis menangkapnya
+- localStorage dihapus dan user diarahkan kembali ke halaman login
+- Ini memastikan tidak ada data sensitif yang tersisa di browser saat sesi berakhir
+
+## Hasil Pengujian
+
+### Test 1 — Postman Tanpa Token (Harus 401)
+
+**Langkah:**
+1. Buka Postman
+2. Method: `POST`
+3. URL: `http://localhost/lab11_ci/ci4/public/post`
+4. Tab Body → x-www-form-urlencoded → isi judul dan isi
+5. Klik Send tanpa menambahkan header Authorization
+
+**Hasil yang diharapkan:** Response HTTP 401 dengan pesan "Akses Ditolak. Token tidak ditemukan pada request!"
+
+> **Screenshot:**
+> ![Postman 401](screenshots/p14_postman_401.png)
+
+---
+
+### Test 2 — Login dan Dapatkan Token
+
+**Langkah:**
+1. Buka `http://localhost/lab8_vuejs/`
+2. Klik menu **Login**
+3. Masukkan username dan password
+4. Klik Masuk Aplikasi
+
+**Hasil yang diharapkan:** Berhasil masuk ke halaman Kelola Artikel, menu berubah dari Login menjadi Logout.
+
+> **Screenshot:**
+> ![Form Login](screenshots/p14_form_login.png)
+
+> **Screenshot:**
+> ![Login Berhasil](screenshots/p14_login_berhasil.png)
+
+---
+
+### Test 3 — DevTools Network (Bukti Token Disuntik Otomatis)
+
+**Langkah:**
+1. Login di `http://localhost/lab8_vuejs/`
+2. Buka DevTools → tab **Network**
+3. Coba hapus salah satu artikel
+4. Klik request yang muncul di panel Network
+5. Lihat tab **Headers** → bagian **Request Headers**
+6. Cari baris `Authorization: Bearer ...`
+
+**Hasil yang diharapkan:** Header `Authorization: Bearer <token>` muncul secara otomatis tanpa ditulis manual di kode komponen.
+
+> **Screenshot:**
+> ![DevTools Authorization Header](screenshots/p14_devtools_auth.png)
+
+---
+
+### Test 4 — Logout
+
+**Langkah:**
+1. Klik link **Logout** di menu navigasi
+2. Muncul konfirmasi "Apakah Anda yakin ingin keluar aplikasi?"
+3. Klik OK
+
+**Hasil yang diharapkan:** localStorage terhapus, kembali ke halaman Beranda, menu kembali menampilkan Login.
+
+> **Screenshot:**
+> ![Konfirmasi Logout](screenshots/p14_logout.png)
+
+---
+
+*Praktikum 14 — Pemrograman Web 2 © 2024 Universitas Pelita Bangsa*
