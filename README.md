@@ -751,10 +751,7 @@ axios.interceptors.response.use(
 
 **Hasil yang diharapkan:** Response HTTP 401 dengan pesan "Akses Ditolak. Token tidak ditemukan pada request!"
 
-> **Screenshot:**
-> ![Postman 401](screenshots/p14_postman_401.png)
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/c8b70283-6a92-4b24-a313-86e9dfa42455" />
 
 ### Test 2 — Login dan Dapatkan Token
 
@@ -766,13 +763,9 @@ axios.interceptors.response.use(
 
 **Hasil yang diharapkan:** Berhasil masuk ke halaman Kelola Artikel, menu berubah dari Login menjadi Logout.
 
-> **Screenshot:**
-> ![Form Login](screenshots/p14_form_login.png)
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/1cf7b0a3-6ea4-4b82-8c17-6c0d472dc3ba" />
 
-> **Screenshot:**
-> ![Login Berhasil](screenshots/p14_login_berhasil.png)
-
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/353d3fba-14d0-48d0-b46f-7f3101e8079c" />
 
 ### Test 3 — DevTools Network (Bukti Token Disuntik Otomatis)
 
