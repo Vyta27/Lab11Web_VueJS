@@ -749,8 +749,6 @@ axios.interceptors.response.use(
 4. Tab Body → x-www-form-urlencoded → isi judul dan isi
 5. Klik Send tanpa menambahkan header Authorization
 
-**Hasil yang diharapkan:** Response HTTP 401 dengan pesan "Akses Ditolak. Token tidak ditemukan pada request!"
-
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/c8b70283-6a92-4b24-a313-86e9dfa42455" />
 
 ### Test 2 — Login dan Dapatkan Token
@@ -760,8 +758,6 @@ axios.interceptors.response.use(
 2. Klik menu **Login**
 3. Masukkan username dan password
 4. Klik Masuk Aplikasi
-
-**Hasil yang diharapkan:** Berhasil masuk ke halaman Kelola Artikel, menu berubah dari Login menjadi Logout.
 
 <img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/1cf7b0a3-6ea4-4b82-8c17-6c0d472dc3ba" />
 
@@ -777,12 +773,13 @@ axios.interceptors.response.use(
 5. Lihat tab **Headers** → bagian **Request Headers**
 6. Cari baris `Authorization: Bearer ...`
 
-**Hasil yang diharapkan:** Header `Authorization: Bearer <token>` muncul secara otomatis tanpa ditulis manual di kode komponen.
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/9b7abab3-d658-48e4-9495-6793d5a6e16f" />
 
-> **Screenshot:**
-> ![DevTools Authorization Header](screenshots/p14_devtools_auth.png)
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/880bc151-90ba-4980-ac1b-06ea10e6adfa" />
 
----
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/f2405ce3-bd30-4a22-8ed2-0825d79d637e" />
+
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/d525a06a-50d0-4839-a641-e92ab42f38fc" />
 
 ### Test 4 — Logout
 
@@ -791,11 +788,6 @@ axios.interceptors.response.use(
 2. Muncul konfirmasi "Apakah Anda yakin ingin keluar aplikasi?"
 3. Klik OK
 
-**Hasil yang diharapkan:** localStorage terhapus, kembali ke halaman Beranda, menu kembali menampilkan Login.
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/26f84f4b-26e4-4c2d-a608-c6956a44525d" />
 
-> **Screenshot:**
-> ![Konfirmasi Logout](screenshots/p14_logout.png)
-
----
-
-*Praktikum 14 — Pemrograman Web 2 © 2024 Universitas Pelita Bangsa*
+<img width="960" height="504" alt="Image" src="https://github.com/user-attachments/assets/f20fecc4-fbc5-44cd-9984-2a5014ea035a" />
